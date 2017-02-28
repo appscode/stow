@@ -88,10 +88,16 @@ type Container interface {
 	// the items to get. It it obtained from a previous
 	// call to this method, or should be CursorStart for the
 	// first page.
+	// delimiter returns results in a directory-like fashion.
+	// Results will contain only items whose names, aside from the
+	// prefix, do not contain delimiter. Items whose names,
+	// aside from the prefix, contain delimiter will have their name,
+	// truncated after the delimiter, returned in prefixes.
+	// Duplicate prefixes are omitted. Optional.
 	// count is the number of items to return per page.
 	// The returned cursor can be checked with IsCursorEnd to
 	// decide if there are any more items or not.
-	Items(prefix, cursor string, count int) ([]Item, string, error)
+	Items(prefix, delimiter, cursor string, count int) ([]Item, string, error)
 	// RemoveItem removes the Item with the specified ID.
 	RemoveItem(id string) error
 	// Put creates a new Item with the specified name, and contents

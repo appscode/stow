@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/graymeta/stow"
+	"io/ioutil"
 )
 
 type container struct {
@@ -75,8 +76,16 @@ func (c *container) Put(name string, r io.Reader, size int64, metadata map[strin
 	return item, nil
 }
 
-func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
-	files, err := flatdirs(c.path)
+func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.Item, string, error) {
+	var files []os.FileInfo
+	var err error
+	if delimiter == "" {
+		files, err = flatdirs(c.path)
+	} else if len(delimiter) == 1 && delimiter[0] == os.PathSeparator {
+		files, err = ioutil.ReadDir(c.path)
+	} else {
+		return nil, "", errors.New("Unknown delimeter " + delimiter)
+	}
 	if err != nil {
 		return nil, "", err
 	}

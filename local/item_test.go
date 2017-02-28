@@ -27,7 +27,7 @@ func TestItemReader(t *testing.T) {
 	is.Equal(cursor, "")
 	three, err := l.Container(containers[0].ID())
 
-	items, cursor, err := three.Items("", stow.CursorStart, 10)
+	items, cursor, err := three.Items("", "", stow.CursorStart, 10)
 	is.NoErr(err)
 	is.Equal(cursor, "")
 	item1 := items[0]
@@ -63,7 +63,7 @@ func TestHardlink(t *testing.T) {
 	links, err := l.Container(containers[0].ID())
 	is.NoErr(err)
 
-	items, cursor, err := links.Items("", stow.CursorStart, 10)
+	items, cursor, err := links.Items("",  "", stow.CursorStart, 10)
 	is.NoErr(err)
 	is.Equal(cursor, "")
 
@@ -100,7 +100,7 @@ func TestSymLink(t *testing.T) {
 	links, err := l.Container(containers[0].ID())
 	is.NoErr(err)
 
-	items, cursor, err := links.Items("", stow.CursorStart, 10)
+	items, cursor, err := links.Items("",  "", stow.CursorStart, 10)
 	is.NoErr(err)
 	is.Equal(cursor, "")
 

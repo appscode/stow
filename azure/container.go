@@ -50,9 +50,10 @@ func (c *container) Item(id string) (stow.Item, error) {
 	return item, nil
 }
 
-func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
+func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.Item, string, error) {
 	params := az.ListBlobsParameters{
 		Prefix:     prefix,
+		Delimiter: delimiter,
 		MaxResults: uint(count),
 	}
 	if cursor != "" {

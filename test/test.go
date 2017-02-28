@@ -111,18 +111,18 @@ func All(t *testing.T, kind string, config stow.Config) {
 	}()
 
 	// make sure we can get a small set of paginated results
-	items, cursor, err := c1.Items(stow.NoPrefix, stow.CursorStart, 1)
+	items, cursor, err := c1.Items(stow.NoPrefix,  "", stow.CursorStart, 1)
 	is.NoErr(err)
 	is.Equal(len(items), 1)
 	is.NotEqual(cursor, "")
 
 	// get the items with a prefix (should only get 2)
-	items, _, err = c1.Items("a_", stow.CursorStart, 100)
+	items, _, err = c1.Items("a_",  "", stow.CursorStart, 100)
 	is.NoErr(err)
 	is.Equal(len(items), 2)
 
 	// make sure we get these three items from the container
-	items, _, err = c1.Items(stow.NoPrefix, stow.CursorStart, 100)
+	items, _, err = c1.Items(stow.NoPrefix,  "", stow.CursorStart, 100)
 	is.NoErr(err)
 	is.Equal(len(items), 3)
 

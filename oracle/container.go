@@ -34,8 +34,9 @@ func (c *container) Item(id string) (stow.Item, error) {
 
 // Items returns a collection of CloudStorage objects based on a matching
 // prefix string and cursor information.
-func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
+func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.Item, string, error) {
 	params := &swift.ObjectsOpts{
+		Delimiter: delimiter,
 		Limit:  count,
 		Marker: cursor,
 		Prefix: prefix,

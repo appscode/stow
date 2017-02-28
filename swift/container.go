@@ -29,8 +29,9 @@ func (c *container) Item(id string) (stow.Item, error) {
 	return c.getItem(id)
 }
 
-func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
+func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.Item, string, error) {
 	params := &swift.ObjectsOpts{
+		Delimiter: delimiter,
 		Limit:  count,
 		Marker: cursor,
 		Prefix: prefix,
