@@ -1,13 +1,14 @@
 package swift
 
 import (
+	"fmt"
 	"io"
 	"strings"
-
-	"github.com/pkg/errors"
+	"unicode/utf8"
 
 	"github.com/graymeta/stow"
 	"github.com/ncw/swift"
+	"github.com/pkg/errors"
 )
 
 type container struct {
@@ -31,10 +32,17 @@ func (c *container) Item(id string) (stow.Item, error) {
 
 func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.Item, string, error) {
 	params := &swift.ObjectsOpts{
-		Delimiter: delimiter,
 		Limit:  count,
 		Marker: cursor,
 		Prefix: prefix,
+	}
+	r, sz := utf8.DecodeRuneInString(delimiter)
+	if r == utf8.RuneError {
+		if sz > 0 {
+			return nil, "", fmt.Errorf("Bad delimiter %v", delimiter)
+		}
+	} else {
+		params.Delimiter = r
 	}
 	objects, err := c.client.Objects(c.id, params)
 	if err != nil {

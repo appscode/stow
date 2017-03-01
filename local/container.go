@@ -2,14 +2,16 @@ package local
 
 import (
 	"errors"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/graymeta/stow"
-	"io/ioutil"
 )
 
 type container struct {
@@ -79,9 +81,14 @@ func (c *container) Put(name string, r io.Reader, size int64, metadata map[strin
 func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.Item, string, error) {
 	var files []os.FileInfo
 	var err error
-	if delimiter == "" {
-		files, err = flatdirs(c.path)
-	} else if len(delimiter) == 1 && delimiter[0] == os.PathSeparator {
+	r, sz := utf8.DecodeRuneInString(delimiter)
+	if r == utf8.RuneError {
+		if sz == 0 {
+			files, err = flatdirs(c.path)
+		} else {
+			return nil, "", fmt.Errorf("Bad delimiter %v", delimiter)
+		}
+	} else if sz == len(delimiter) && r == os.PathSeparator {
 		files, err = ioutil.ReadDir(c.path)
 	} else {
 		return nil, "", errors.New("Unknown delimeter " + delimiter)
