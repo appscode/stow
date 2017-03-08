@@ -30,7 +30,7 @@ func (c *container) Item(id string) (stow.Item, error) {
 	return c.getItem(id)
 }
 
-func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.Item, string, error) {
+func (c *container) Browse(prefix, delimiter, cursor string, count int) ([]string, []stow.Item, string, error) {
 	params := &swift.ObjectsOpts{
 		Limit:  count,
 		Marker: cursor,
@@ -39,32 +39,47 @@ func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.I
 	r, sz := utf8.DecodeRuneInString(delimiter)
 	if r == utf8.RuneError {
 		if sz > 0 {
-			return nil, "", fmt.Errorf("Bad delimiter %v", delimiter)
+			return nil, nil, "", fmt.Errorf("Bad delimiter %v", delimiter)
 		}
 	} else {
 		params.Delimiter = r
 	}
 	objects, err := c.client.Objects(c.id, params)
 	if err != nil {
-		return nil, "", err
+		return nil, nil, "", err
 	}
-	items := make([]stow.Item, len(objects))
-	for i, obj := range objects {
 
-		items[i] = &item{
+	var prefixes []string
+	for _, obj := range objects {
+		if obj.PseudoDirectory {
+			prefixes = append(prefixes, obj.Name)
+		}
+	}
+
+	var items []stow.Item
+	for _, obj := range objects {
+		if obj.PseudoDirectory {
+			continue
+		}
+		items = append(items, &item{
 			id:           obj.Name,
 			container:    c,
 			client:       c.client,
 			hash:         obj.Hash,
 			size:         obj.Bytes,
 			lastModified: obj.LastModified,
-		}
+		})
 	}
 	marker := ""
 	if len(objects) == count {
 		marker = objects[len(objects)-1].Name
 	}
-	return items, marker, nil
+	return prefixes, items, marker, nil
+}
+
+func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
+	_, items, cursor, err := c.Browse(prefix, "", cursor, count)
+	return items, cursor, err
 }
 
 func (c *container) Put(name string, r io.Reader, size int64, metadata map[string]interface{}) (stow.Item, error) {

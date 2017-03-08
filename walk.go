@@ -21,7 +21,7 @@ func Walk(container Container, prefix string, pageSize int, fn WalkFunc) error {
 		cursor = CursorStart
 	)
 	for {
-		items, cursor, err = container.Items(prefix, "", cursor, pageSize)
+		items, cursor, err = container.Items(prefix, cursor, pageSize)
 		if err != nil {
 			err = fn(nil, err)
 			if err != nil {

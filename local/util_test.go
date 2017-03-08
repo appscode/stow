@@ -106,7 +106,7 @@ func TestCreateItem(t *testing.T) {
 	is.NoErr(err)
 	is.OK(containers)
 	c1 := containers[0]
-	items, cursor, err := c1.Items("",  "",  stow.CursorStart, 10)
+	items, cursor, err := c1.Items("", stow.CursorStart, 10)
 	is.NoErr(err)
 	is.Equal(cursor, "")
 	beforecount := len(items)
@@ -123,7 +123,7 @@ func TestCreateItem(t *testing.T) {
 	is.OK(containers)
 	is.Equal(cursor, "")
 	c1 = containers[0]
-	items, cursor, err = c1.Items("",  "", stow.CursorStart, 10)
+	items, cursor, err = c1.Items("", stow.CursorStart, 10)
 	is.NoErr(err)
 	is.Equal(cursor, "")
 	aftercount := len(items)
@@ -162,7 +162,7 @@ func TestItems(t *testing.T) {
 	is.Equal(cursor, "")
 	three, err := l.Container(containers[0].ID())
 	is.NoErr(err)
-	items, cursor, err := three.Items("",  "", stow.CursorStart, 10)
+	items, cursor, err := three.Items("", stow.CursorStart, 10)
 	is.NoErr(err)
 	is.OK(items)
 	is.Equal(cursor, "")

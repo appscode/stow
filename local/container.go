@@ -78,7 +78,7 @@ func (c *container) Put(name string, r io.Reader, size int64, metadata map[strin
 	return item, nil
 }
 
-func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.Item, string, error) {
+func (c *container) Browse(prefix, delimiter, cursor string, count int) ([]string, []stow.Item, string, error) {
 	var files []os.FileInfo
 	var err error
 	r, sz := utf8.DecodeRuneInString(delimiter)
@@ -86,15 +86,15 @@ func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.I
 		if sz == 0 {
 			files, err = flatdirs(c.path)
 		} else {
-			return nil, "", fmt.Errorf("Bad delimiter %v", delimiter)
+			return nil, nil, "", fmt.Errorf("Bad delimiter %v", delimiter)
 		}
 	} else if sz == len(delimiter) && r == os.PathSeparator {
 		files, err = ioutil.ReadDir(c.path)
 	} else {
-		return nil, "", errors.New("Unknown delimeter " + delimiter)
+		return nil, nil, "", errors.New("Unknown delimeter " + delimiter)
 	}
 	if err != nil {
-		return nil, "", err
+		return nil, nil, "", err
 	}
 	if cursor != stow.CursorStart {
 		// seek to the cursor
@@ -107,7 +107,7 @@ func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.I
 			}
 		}
 		if !ok {
-			return nil, "", stow.ErrBadCursor
+			return nil, nil, "", stow.ErrBadCursor
 		}
 	}
 	if len(files) > count {
@@ -116,6 +116,19 @@ func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.I
 	} else if len(files) <= count {
 		cursor = "" // end
 	}
+
+	var prefixes []string
+	for _, f := range files {
+		if !f.IsDir() {
+			continue
+		}
+		path, err := filepath.Abs(filepath.Join(c.path, f.Name()))
+		if err != nil {
+			return nil, nil, "", err
+		}
+		prefixes = append(prefixes, path)
+	}
+
 	var items []stow.Item
 	for _, f := range files {
 		if f.IsDir() {
@@ -123,7 +136,7 @@ func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.I
 		}
 		path, err := filepath.Abs(filepath.Join(c.path, f.Name()))
 		if err != nil {
-			return nil, "", err
+			return nil, nil, "", err
 		}
 		if !strings.HasPrefix(f.Name(), prefix) {
 			continue
@@ -133,7 +146,12 @@ func (c *container) Items(prefix, delimiter, cursor string, count int) ([]stow.I
 		}
 		items = append(items, item)
 	}
-	return items, cursor, nil
+	return prefixes, items, cursor, nil
+}
+
+func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
+	_, items, cursor, err := c.Browse(prefix, "", cursor, count)
+	return items, cursor, err
 }
 
 func (c *container) Item(id string) (stow.Item, error) {

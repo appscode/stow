@@ -58,7 +58,7 @@ func TestAllContainer(t *testing.T) {
 
 	is.Equal(containers[0].Name(), "All")
 
-	items, cursor, err := containers[0].Items("root",  "", stow.CursorStart, 10)
+	items, cursor, err := containers[0].Items("root", stow.CursorStart, 10)
 	is.Equal(cursor, "")
 	is.OK(items)
 	is.NoErr(err)
@@ -166,7 +166,7 @@ func TestByURL(t *testing.T) {
 
 	three, err := l.Container(containers[0].ID())
 	is.NoErr(err)
-	items, cursor, err := three.Items("",  "", stow.CursorStart, 10)
+	items, cursor, err := three.Items("", stow.CursorStart, 10)
 	is.NoErr(err)
 	is.OK(items)
 	is.Equal(cursor, "")

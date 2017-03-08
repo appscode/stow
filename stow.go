@@ -82,8 +82,8 @@ type Container interface {
 	Name() string
 	// Item gets an item by its ID.
 	Item(id string) (Item, error)
-	// Items gets a page of items with the specified
-	// prefix for this Container.
+	// Browse gets a page of prefixes and items with the specified
+	// prefix and delimiter for this Container.
 	// The specified cursor is a pointer to the start of
 	// the items to get. It it obtained from a previous
 	// call to this method, or should be CursorStart for the
@@ -97,7 +97,18 @@ type Container interface {
 	// count is the number of items to return per page.
 	// The returned cursor can be checked with IsCursorEnd to
 	// decide if there are any more items or not.
-	Items(prefix, delimiter, cursor string, count int) ([]Item, string, error)
+	Browse(prefix, delimiter, cursor string, count int) ([]string, []Item, string, error)
+	// Items gets a page of items with the specified
+	// prefix for this Container.
+	// The specified cursor is a pointer to the start of
+	// the items to get. It it obtained from a previous
+	// call to this method, or should be CursorStart for the
+	// first page.
+	// count is the number of items to return per page.
+	// The returned cursor can be checked with IsCursorEnd to
+	// decide if there are any more items or not.
+	// Items is a shortcut for Browse where delimeter is not set.
+	Items(prefix, cursor string, count int) ([]Item, string, error)
 	// RemoveItem removes the Item with the specified ID.
 	RemoveItem(id string) error
 	// Put creates a new Item with the specified name, and contents
