@@ -35,8 +35,6 @@ func (c *container) Item(id string) (stow.Item, error) {
 	return c.getItem(id)
 }
 
-// Items sends a request to retrieve a list of items that are prepended with
-// the prefix argument. The 'cursor' variable facilitates pagination.
 func (c *container) Browse(prefix, delimiter, cursor string, count int) ([]string, []stow.Item, string, error) {
 	itemLimit := int64(count)
 
@@ -89,6 +87,8 @@ func (c *container) Browse(prefix, delimiter, cursor string, count int) ([]strin
 	return prefixes, containerItems, marker, nil
 }
 
+// Items sends a request to retrieve a list of items that are prepended with
+// the prefix argument. The 'cursor' variable facilitates pagination.
 func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
 	_, items, cursor, err := c.Browse(prefix, "", cursor, count)
 	return items, cursor, err

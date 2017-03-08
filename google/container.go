@@ -70,8 +70,6 @@ func (c *Container) Item(id string) (stow.Item, error) {
 	return i, nil
 }
 
-// Items retrieves a list of items that are prepended with
-// the prefix argument. The 'cursor' variable facilitates pagination.
 func (c *Container) Browse(prefix string, delimiter string, cursor string, count int) ([]string, []stow.Item, string, error) {
 	// List all objects in a bucket using pagination
 	call := c.client.Objects.List(c.name).Delimiter(delimiter).MaxResults(int64(count))
@@ -128,6 +126,8 @@ func (c *Container) Browse(prefix string, delimiter string, cursor string, count
 	return prefixes, containerItems, res.NextPageToken, nil
 }
 
+// Items retrieves a list of items that are prepended with
+// the prefix argument. The 'cursor' variable facilitates pagination.
 func (c *Container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
 	_, items, cursor, err := c.Browse(prefix, "", cursor, count)
 	return items, cursor, err

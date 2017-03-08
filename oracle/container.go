@@ -34,8 +34,6 @@ func (c *container) Item(id string) (stow.Item, error) {
 	return c.getItem(id)
 }
 
-// Items returns a collection of CloudStorage objects based on a matching
-// prefix string and cursor information.
 func (c *container) Browse(prefix, delimiter, cursor string, count int) ([]string, []stow.Item, string, error) {
 	params := &swift.ObjectsOpts{
 		Limit:  count,
@@ -83,6 +81,8 @@ func (c *container) Browse(prefix, delimiter, cursor string, count int) ([]strin
 	return prefixes, items, marker, nil
 }
 
+// Items returns a collection of CloudStorage objects based on a matching
+// prefix string and cursor information.
 func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
 	_, items, cursor, err := c.Browse(prefix, "", cursor, count)
 	return items, cursor, err
