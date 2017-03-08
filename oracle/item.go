@@ -1,6 +1,8 @@
 package swift
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"net/url"
 	"path"
@@ -56,6 +58,27 @@ func (i *item) Size() (int64, error) {
 // of the CloudStorage object.
 func (i *item) Open() (io.ReadCloser, error) {
 	r, _, err := i.client.ObjectOpen(i.container.id, i.id, false, nil)
+	var res io.ReadCloser = r
+	// FIXME: this is a workaround to issue https://github.com/graymeta/stow/issues/120
+	if s, ok := res.(readSeekCloser); ok {
+		res = &fixReadSeekCloser{readSeekCloser: s, item: i}
+	}
+	return res, err
+}
+
+func (i *item) Partial(length, offset int64) (io.ReadCloser, error) {
+	if offset < 0 {
+		return nil, errors.New("offset is negative")
+	}
+	var rng string
+	if length > 0 {
+		rng = fmt.Sprintf("bytes=%d-%d", offset, offset+length)
+	} else {
+		rng = fmt.Sprintf("bytes=%d-", offset)
+	}
+	r, _, err := i.client.ObjectOpen(i.container.id, i.id, false, swift.Headers{
+		"Range": rng,
+	})
 	var res io.ReadCloser = r
 	// FIXME: this is a workaround to issue https://github.com/graymeta/stow/issues/120
 	if s, ok := res.(readSeekCloser); ok {
