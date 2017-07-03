@@ -34,7 +34,11 @@ func (c *container) Item(id string) (stow.Item, error) {
 	return c.getItem(id)
 }
 
-// Items retreives a list of items from b2. Since the b2 ListFileNames operation
+func (c *container) Browse(prefix, delimiter string, cursor string, count int) (*stow.ItemPage, error) {
+	return nil, errors.New("unsupported")
+}
+
+// Items retrieves a list of items from b2. Since the b2 ListFileNames operation
 // does not natively support a prefix, we fake it ourselves
 func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
 	items := make([]stow.Item, 0, count)
