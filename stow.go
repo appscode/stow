@@ -85,6 +85,22 @@ type Container interface {
 	Name() string
 	// Item gets an item by its ID.
 	Item(id string) (Item, error)
+	// Browse gets a page of prefixes and items with the specified
+	// prefix and delimiter for this Container.
+	// The specified cursor is a pointer to the start of
+	// the items to get. It it obtained from a previous
+	// call to this method, or should be CursorStart for the
+	// first page.
+	// delimiter returns results in a directory-like fashion.
+	// Results will contain only items whose names, aside from the
+	// prefix, do not contain delimiter. Items whose names,
+	// aside from the prefix, contain delimiter will have their name,
+	// truncated after the delimiter, returned in prefixes.
+	// Duplicate prefixes are omitted. Optional.
+	// count is the number of items to return per page.
+	// The returned cursor can be checked with IsCursorEnd to
+	// decide if there are any more items or not.
+	Browse(prefix, delimiter, cursor string, count int) (*ItemPage, error)
 	// Items gets a page of items with the specified
 	// prefix for this Container.
 	// The specified cursor is a pointer to the start of
@@ -94,12 +110,15 @@ type Container interface {
 	// count is the number of items to return per page.
 	// The returned cursor can be checked with IsCursorEnd to
 	// decide if there are any more items or not.
+	// Items is a shortcut for Browse where delimeter is not set.
 	Items(prefix, cursor string, count int) ([]Item, string, error)
 	// RemoveItem removes the Item with the specified ID.
 	RemoveItem(id string) error
 	// Put creates a new Item with the specified name, and contents
 	// read from the reader.
 	Put(name string, r io.Reader, size int64, metadata map[string]interface{}) (Item, error)
+	// HasWriteAccess returns null if items cane be created and deleted from this container.
+	HasWriteAccess() error
 }
 
 // Item represents an item inside a Container.
@@ -142,6 +161,12 @@ type ItemRanger interface {
 type Taggable interface {
 	// Tags returns a list of tags that belong to a given Item
 	Tags() (map[string]interface{}, error)
+}
+
+type ItemPage struct {
+	Prefixes []string
+	Items    []Item
+	Cursor   string
 }
 
 // Config represents key/value configuration.

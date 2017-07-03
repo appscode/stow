@@ -1,6 +1,11 @@
 package s3
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"fmt"
+	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -41,6 +46,14 @@ const (
 	// ConfigEndpoint is optional config value for changing s3 endpoint
 	// used for e.g. minio.io
 	ConfigEndpoint = "endpoint"
+
+	// ConfigCACertFile is optional config value for providing path to cacert file for custom endpoint like Minio
+	// to establish TLS secure connection
+	ConfigCACertFile = "cacert_file"
+
+	// ConfigCACertData is optional config value for providing path to cacert data for custom endpoint like Minio
+	// to establish TLS secure connection
+	ConfigCACertData = "cacert_data"
 
 	// ConfigDisableSSL is optional config value for disabling SSL support on custom endpoints
 	// Its default value is "false", to disable SSL set it to "true".
@@ -164,9 +177,29 @@ func newS3Client(config stow.Config, region string) (client *s3.S3, endpoint str
 		awsConfig.WithDisableSSL(true)
 	}
 
+	cacertData, ok := config.Config(ConfigCACertData)
+	if ok {
+		awsConfig.HTTPClient.Transport, err = newSecureTransport([]byte(cacertData))
+		if err != nil {
+			return nil, "", err
+		}
+	} else {
+		cacertFile, ok := config.Config(ConfigCACertFile)
+		if ok {
+			cacert, err := ioutil.ReadFile(cacertFile)
+			if err != nil {
+				return nil, "", errors.Errorf("unable to read root certificate: %v", err)
+			}
+			awsConfig.HTTPClient.Transport, err = newSecureTransport(cacert)
+			if err != nil {
+				return nil, "", err
+			}
+		}
+	}
+
 	sess, err := session.NewSession(awsConfig)
 	if err != nil {
-		return nil, "", err
+		return nil, "", fmt.Errorf("failed to create S3 session. Reason: %s", err)
 	}
 	if sess == nil {
 		return nil, "", errors.New("creating the S3 session")
@@ -180,4 +213,33 @@ func newS3Client(config stow.Config, region string) (client *s3.S3, endpoint str
 	}
 
 	return s3Client, endpoint, nil
+}
+
+func newSecureTransport(cacert []byte) (http.RoundTripper, error) {
+	if len(cacert) == 0 {
+		return nil, fmt.Errorf("missing root certificate")
+	}
+
+	tr := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		MaxIdleConns:          100,
+		MaxIdleConnsPerHost:   100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+		TLSClientConfig:       &tls.Config{},
+	}
+
+	pool := x509.NewCertPool()
+	if ok := pool.AppendCertsFromPEM(cacert); !ok {
+		return nil, errors.Errorf("cannot parse root certificate from %q", string(cacert))
+	}
+	tr.TLSClientConfig.RootCAs = pool
+
+	return tr, nil
 }

@@ -1,6 +1,7 @@
 package s3
 
 import (
+	"bytes"
 	"io"
 	"strings"
 
@@ -42,7 +43,7 @@ func (c *container) Item(id string) (stow.Item, error) {
 
 // Items sends a request to retrieve a list of items that are prepended with
 // the prefix argument. The 'cursor' variable facilitates pagination.
-func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
+func (c *container) Browse(prefix, delimiter, cursor string, count int) (*stow.ItemPage, error) {
 	itemLimit := int64(count)
 
 	params := &s3.ListObjectsV2Input{
@@ -54,11 +55,15 @@ func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string
 
 	response, err := c.client.ListObjectsV2(params)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "Items, listing objects")
+		return nil, errors.Wrap(err, "Items, listing objects")
 	}
 
-	var containerItems []stow.Item
+	prefixes := make([]string, len(response.CommonPrefixes))
+	for i, prefix := range response.CommonPrefixes {
+		prefixes[i] = *prefix.Prefix
+	}
 
+	containerItems := make([]stow.Item, 0, len(response.Contents)) // Allocate space for the Item slice.
 	for _, object := range response.Contents {
 		if *object.StorageClass == "GLACIER" {
 			continue
@@ -88,7 +93,17 @@ func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string
 		startAfter = containerItems[len(containerItems)-1].Name()
 	}
 
-	return containerItems, startAfter, nil
+	return &stow.ItemPage{Prefixes: prefixes, Items: containerItems, Cursor: startAfter}, nil
+}
+
+// Items sends a request to retrieve a list of items that are prepended with
+// the prefix argument. The 'cursor' variable facilitates pagination.
+func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string, error) {
+	page, err := c.Browse(prefix, "", cursor, count)
+	if err != nil {
+		return nil, "", err
+	}
+	return page.Items, page.Cursor, err
 }
 
 func (c *container) RemoveItem(id string) error {
@@ -265,4 +280,17 @@ func parseMetadata(md map[string]*string) (map[string]interface{}, error) {
 		m[k] = *value
 	}
 	return m, nil
+}
+
+func (c *container) HasWriteAccess() error {
+	// TODO: Use https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETpolicy.html ?
+	r := bytes.NewReader([]byte("CheckBucketAccess"))
+	item, err := c.Put(".can_write", r, r.Size(), nil)
+	if err != nil {
+		return err
+	}
+	if err := c.RemoveItem(item.ID()); err != nil {
+		return err
+	}
+	return nil
 }

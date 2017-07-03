@@ -31,6 +31,10 @@ func determineChunkSize(size int64) (int64, error) {
 	var chunkSize = int64(startChunkSize)
 
 	for {
+		if size <= 0 {
+			break
+		}
+
 		parts := size / chunkSize
 		rem := size % chunkSize
 
