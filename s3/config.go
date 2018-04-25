@@ -48,9 +48,9 @@ const (
 	// used for e.g. minio.io
 	ConfigEndpoint = "endpoint"
 
-	// ConfigCACert is optional config value for providing cacerts for custom endpoint like minio
+	// ConfigCACertDir is optional config value for providing cacerts for custom endpoint like minio
 	// provide root CAs certificate directory to establish TLS secure connection
-	ConfigCACert = "cacert"
+	ConfigCACertDir = "cacert_dir"
 
 	// ConfigDisableSSL is optional config value for disabling SSL support on custom endpoints
 	// Its default value is "false", to disable SSL set it to "true".
@@ -167,7 +167,7 @@ func newS3Client(config stow.Config) (client *s3.S3, endpoint string, err error)
 		awsConfig.WithDisableSSL(true)
 	}
 
-	cacertDir, ok := config.Config(ConfigCACert)
+	cacertDir, ok := config.Config(ConfigCACertDir)
 	if ok {
 		awsConfig.HTTPClient.Transport, err = newTLSTransport(cacertDir)
 		if err != nil {
