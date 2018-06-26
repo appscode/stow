@@ -1,7 +1,9 @@
-![Stow logo](stow-aeroplane.png)
-![Stow definition](stow-definition.png)
 [![GoDoc](https://godoc.org/github.com/graymeta/stow?status.svg)](https://godoc.org/github.com/graymeta/stow)
 [![Go Report Card](https://goreportcard.com/badge/github.com/graymeta/stow)](https://goreportcard.com/report/github.com/graymeta/stow)
+[![Build Status](https://travis-ci.org/appscode/stow.svg?branch=master)](https://travis-ci.org/appscode/stow)
+
+![Stow logo](stow-aeroplane.png)
+![Stow definition](stow-definition.png)
 
 Cloud storage abstraction package for Go.
 
