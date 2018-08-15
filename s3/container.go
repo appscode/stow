@@ -1,6 +1,7 @@
 package s3
 
 import (
+	"bytes"
 	"io"
 	"os"
 	"strings"
@@ -268,4 +269,17 @@ func parseMetadata(md map[string]*string) (map[string]interface{}, error) {
 		m[k] = *value
 	}
 	return m, nil
+}
+
+func (c *container) HasWriteAccess() error {
+	// TODO: Use https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETpolicy.html ?
+	r := bytes.NewReader([]byte("CheckBucketAccess"))
+	item, err := c.Put(".objectstore", r, r.Size(), nil)
+	if err != nil {
+		return err
+	}
+	if err := c.RemoveItem(item.ID()); err != nil {
+		return err
+	}
+	return nil
 }

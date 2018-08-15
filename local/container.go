@@ -1,6 +1,7 @@
 package local
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -207,4 +208,16 @@ type fileinfo struct {
 
 func (f fileinfo) Name() string {
 	return f.name
+}
+
+func (c *container) HasWriteAccess() error {
+	r := bytes.NewReader([]byte("CheckBucketAccess"))
+	item, err := c.Put(".objectstore", r, r.Size(), nil)
+	if err != nil {
+		return err
+	}
+	if err := c.RemoveItem(item.ID()); err != nil {
+		return err
+	}
+	return nil
 }
