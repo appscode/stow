@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -82,20 +81,24 @@ func (c *container) Put(name string, r io.Reader, size int64, metadata map[strin
 }
 
 func (c *container) Browse(prefix, delimiter, cursor string, count int) (*stow.ItemPage, error) {
-	prefix = filepath.FromSlash(prefix)
+	conPrefixLen := len(c.path) + 1
+
 	var files []os.FileInfo
 	var err error
 	r, sz := utf8.DecodeRuneInString(delimiter)
 	if r == utf8.RuneError {
 		if sz == 0 {
-			files, err = flatdirs(c.path)
+			prefixDir, _ := filepath.Split(filepath.FromSlash(prefix))
+			dir := filepath.Join(c.path, prefixDir)
+			files, err = flatdirs(dir)
 		} else {
-			return nil, fmt.Errorf("Bad delimiter %v", delimiter)
+			return nil, fmt.Errorf("bad delimiter %v", delimiter)
 		}
-	} else if sz == len(delimiter) && r == os.PathSeparator {
-		files, err = ioutil.ReadDir(c.path)
+	} else if sz == len(delimiter) && r == '/' {
+		dir := filepath.Join(c.path, filepath.FromSlash(prefix))
+		files, err = readDir(dir)
 	} else {
-		return nil, errors.New("Unknown delimeter " + delimiter)
+		return nil, fmt.Errorf("unknown delimiter %v", delimiter)
 	}
 	if err != nil {
 		return nil, err
@@ -103,8 +106,9 @@ func (c *container) Browse(prefix, delimiter, cursor string, count int) (*stow.I
 	if cursor != stow.CursorStart {
 		// seek to the cursor
 		ok := false
+		c := filepath.Join(c.path, cursor)
 		for i, file := range files {
-			if file.Name() == cursor {
+			if file.Name() == c {
 				files = files[i:]
 				ok = true
 				break
@@ -115,7 +119,7 @@ func (c *container) Browse(prefix, delimiter, cursor string, count int) (*stow.I
 		}
 	}
 	if len(files) > count {
-		cursor = files[count].Name()
+		cursor = files[count].Name()[conPrefixLen:] // next item path as cursor
 		files = files[:count]
 	} else if len(files) <= count {
 		cursor = "" // end
@@ -126,11 +130,10 @@ func (c *container) Browse(prefix, delimiter, cursor string, count int) (*stow.I
 		if !f.IsDir() {
 			continue
 		}
-		path, err := filepath.Abs(filepath.Join(c.path, f.Name()))
-		if err != nil {
-			return nil, err
+		path := filepath.ToSlash(f.Name()[conPrefixLen:])
+		if strings.HasPrefix(path, prefix) {
+			prefixes = append(prefixes, path)
 		}
-		prefixes = append(prefixes, path)
 	}
 
 	var items []stow.Item
@@ -138,18 +141,14 @@ func (c *container) Browse(prefix, delimiter, cursor string, count int) (*stow.I
 		if f.IsDir() {
 			continue
 		}
-		path, err := filepath.Abs(filepath.Join(c.path, f.Name()))
-		if err != nil {
-			return nil, err
+		path := filepath.ToSlash(f.Name()[conPrefixLen:])
+		if strings.HasPrefix(path, prefix) {
+			item := &item{
+				path:          f.Name(),
+				contPrefixLen: conPrefixLen,
+			}
+			items = append(items, item)
 		}
-		if !strings.HasPrefix(f.Name(), prefix) {
-			continue
-		}
-		item := &item{
-			path:          path,
-			contPrefixLen: len(c.path) + 1,
-		}
-		items = append(items, item)
 	}
 	return &stow.ItemPage{Prefixes: prefixes, Items: items, Cursor: cursor}, nil
 }
@@ -159,7 +158,7 @@ func (c *container) Items(prefix, cursor string, count int) ([]stow.Item, string
 	if err != nil {
 		return nil, "", err
 	}
-	return page.Items, cursor, err
+	return page.Items, page.Cursor, err
 }
 
 func (c *container) Item(id string) (stow.Item, error) {
@@ -185,6 +184,29 @@ func (c *container) Item(id string) (stow.Item, error) {
 	return item, nil
 }
 
+// readDir reads the directory named by dirname and returns
+// a list of directory entries sorted by filename.
+func readDir(dirname string) ([]os.FileInfo, error) {
+	f, err := os.Open(dirname)
+	if err != nil {
+		return nil, err
+	}
+	list, err := f.Readdir(-1)
+	f.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range list {
+		info := list[i]
+		list[i] = fileinfo{
+			FileInfo: info,
+			path:     filepath.Join(dirname, info.Name()),
+		}
+	}
+	return list, nil
+}
+
 // flatdirs walks the entire tree returning a list of
 // os.FileInfo for all items encountered.
 func flatdirs(path string) ([]os.FileInfo, error) {
@@ -193,32 +215,24 @@ func flatdirs(path string) ([]os.FileInfo, error) {
 		if err != nil {
 			return err
 		}
-		if info.IsDir() {
-			return nil
+		if !info.IsDir() {
+			list = append(list, fileinfo{
+				FileInfo: info,
+				path:     p,
+			})
 		}
-		flatname, err := filepath.Rel(path, p)
-		if err != nil {
-			return err
-		}
-		list = append(list, fileinfo{
-			FileInfo: info,
-			name:     flatname,
-		})
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return list, nil
+	return list, err
 }
 
 type fileinfo struct {
 	os.FileInfo
-	name string
+	path string
 }
 
 func (f fileinfo) Name() string {
-	return f.name
+	return f.path
 }
 
 func (c *container) HasWriteAccess() error {
