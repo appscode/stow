@@ -7,8 +7,8 @@ import (
 	"time"
 
 	az "github.com/Azure/azure-sdk-for-go/storage"
-	"github.com/graymeta/stow"
 	"github.com/pkg/errors"
+	"gomodules.xyz/stow"
 )
 
 type item struct {

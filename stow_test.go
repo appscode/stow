@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/cheekybits/is"
-	"github.com/graymeta/stow"
+	"gomodules.xyz/stow"
 )
 
 func TestKindByURL(t *testing.T) {

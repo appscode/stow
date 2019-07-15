@@ -10,8 +10,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/graymeta/stow"
 	"github.com/pkg/errors"
+	"gomodules.xyz/stow"
 )
 
 // The item struct contains an id (also the name of the file/S3 Object/Item),

@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/cheekybits/is"
-	"github.com/graymeta/stow"
+	"gomodules.xyz/stow"
 )
 
 // All runs a generic suite of tests for Stow storage

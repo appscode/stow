@@ -7,9 +7,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/graymeta/stow"
 	"github.com/ncw/swift"
 	"github.com/pkg/errors"
+	"gomodules.xyz/stow"
 )
 
 type container struct {

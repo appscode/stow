@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/graymeta/stow"
+	"gomodules.xyz/stow"
 	"gopkg.in/kothar/go-backblaze.v0"
 )
 

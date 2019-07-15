@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/graymeta/stow"
 	"github.com/pkg/errors"
+	"gomodules.xyz/stow"
 	"gopkg.in/kothar/go-backblaze.v0"
 )
 

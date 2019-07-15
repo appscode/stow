@@ -7,8 +7,8 @@ import (
 	"time"
 
 	az "github.com/Azure/azure-sdk-for-go/storage"
-	"github.com/graymeta/stow"
 	"github.com/pkg/errors"
+	"gomodules.xyz/stow"
 )
 
 // The maximum size of an object that can be Put in a single request

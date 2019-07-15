@@ -4,8 +4,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/graymeta/stow"
 	"github.com/pkg/errors"
+	"gomodules.xyz/stow"
 	storage "google.golang.org/api/storage/v1"
 )
 

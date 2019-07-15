@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/graymeta/stow"
 	"github.com/ncw/swift"
+	"gomodules.xyz/stow"
 )
 
 type item struct {

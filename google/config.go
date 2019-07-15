@@ -11,7 +11,7 @@ import (
 	"golang.org/x/oauth2/google"
 	storage "google.golang.org/api/storage/v1"
 
-	"github.com/graymeta/stow"
+	"gomodules.xyz/stow"
 )
 
 // Kind represents the name of the location/storage type.

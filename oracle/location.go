@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/graymeta/stow"
 	"github.com/ncw/swift"
+	"gomodules.xyz/stow"
 )
 
 type location struct {

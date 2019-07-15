@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/graymeta/stow"
 	"github.com/ncw/swift"
+	"gomodules.xyz/stow"
 )
 
 type item struct {
@@ -57,7 +57,7 @@ func (i *item) Size() (int64, error) {
 func (i *item) Open() (io.ReadCloser, error) {
 	r, _, err := i.client.ObjectOpen(i.container.id, i.id, false, nil)
 	var res io.ReadCloser = r
-	// FIXME: this is a workaround to issue https://github.com/graymeta/stow/issues/120
+	// FIXME: this is a workaround to issue https://gomodules.xyz/stow/issues/120
 	if s, ok := res.(readSeekCloser); ok {
 		res = &fixReadSeekCloser{readSeekCloser: s, item: i}
 	}

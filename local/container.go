@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/graymeta/stow"
+	"gomodules.xyz/stow"
 )
 
 type container struct {

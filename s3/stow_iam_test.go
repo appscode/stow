@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/graymeta/stow"
-	"github.com/graymeta/stow/test"
+	"gomodules.xyz/stow"
+	"gomodules.xyz/stow/test"
 )
 
 func TestStowIAM(t *testing.T) {

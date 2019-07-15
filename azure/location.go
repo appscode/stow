@@ -7,7 +7,7 @@ import (
 	"time"
 
 	az "github.com/Azure/azure-sdk-for-go/storage"
-	"github.com/graymeta/stow"
+	"gomodules.xyz/stow"
 )
 
 type location struct {

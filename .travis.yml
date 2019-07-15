@@ -1,14 +1,21 @@
 language: go
-
-sudo: required
-
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y lsof
-
 go:
-    - tip
+ - 1.x
+ - tip
 
-install: go get -v ./...
+go_import_path: gomodules.xyz/stow
 
-script: go test -v ./...
+env:
+  global:
+  - GO111MODULE=on
+
+cache:
+  directories:
+  - $HOME/.cache/go-build
+  - $GOPATH/pkg/mod
+
+install: true
+
+script:
+  - go build ./...
+  - go test -v ./...

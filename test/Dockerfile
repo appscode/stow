@@ -17,4 +17,4 @@ RUN wget -q -O /usr/local/${gofile} ${gourl} \
   && mkdir /usr/local/go \
   && tar -xzf /usr/local/${gofile} -C /usr/local/go --strip 1
 
-CMD cd /mnt/src/github.com/graymeta/stow && GOPATH=/mnt PATH=/usr/local/go/bin:$GOPATH/bin:$PATH make test
+CMD cd /mnt/src/gomodules.xyz/stow && GOPATH=/mnt PATH=/usr/local/go/bin:$GOPATH/bin:$PATH make test

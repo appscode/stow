@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/cheekybits/is"
-	"github.com/graymeta/stow"
-	"github.com/graymeta/stow/local"
+	"gomodules.xyz/stow"
+	"gomodules.xyz/stow/local"
 )
 
 func TestContainers(t *testing.T) {
