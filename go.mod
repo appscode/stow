@@ -2,10 +2,12 @@ module gomodules.xyz/stow
 
 require (
 	cloud.google.com/go v0.41.0 // indirect
+	contrib.go.opencensus.io/exporter/ocagent v0.4.12 // indirect
 	github.com/Azure/azure-sdk-for-go v31.1.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.5.0 // indirect
 	github.com/Azure/go-autorest/autorest/mocks v0.2.0 // indirect
 	github.com/Azure/go-autorest/autorest/to v0.2.0 // indirect
+	github.com/Azure/go-autorest/tracing v0.2.0 // indirect
 	github.com/aws/aws-sdk-go v1.20.20
 	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927
 	github.com/davecgh/go-spew v1.1.1 // indirect
