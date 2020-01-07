@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"gomodules.xyz/stow"
 	"gopkg.in/kothar/go-backblaze.v0"
@@ -185,7 +186,7 @@ func parseMetadata(md map[string]string) map[string]interface{} {
 
 func (c *container) HasWriteAccess() error {
 	r := bytes.NewReader([]byte("CheckBucketAccess"))
-	item, err := c.Put(".can_write", r, r.Size(), nil)
+	item, err := c.Put(".trash/"+uuid.New().String(), r, r.Size(), nil)
 	if err != nil {
 		return err
 	}
