@@ -6,18 +6,17 @@ require (
 	github.com/Azure/azure-sdk-for-go v32.5.0+incompatible
 	github.com/Azure/go-autorest/autorest v0.9.0 // indirect
 	github.com/Azure/go-autorest/autorest/to v0.2.0 // indirect
-	github.com/aws/aws-sdk-go v1.20.20
+	github.com/aws/aws-sdk-go v1.34.0
 	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927
 	github.com/dnaeon/go-vcr v1.0.1 // indirect
 	github.com/google/readahead v0.0.0-20161222183148-eaceba169032 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/ncw/swift v1.0.49
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
-	github.com/stretchr/testify v1.4.0 // indirect
-	golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c
+	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	google.golang.org/api v0.6.1-0.20190607001116-5213b8090861
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
