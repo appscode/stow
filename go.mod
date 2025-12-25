@@ -1,27 +1,47 @@
 module gomodules.xyz/stow
 
-go 1.12
+go 1.23.0
 
 require (
 	github.com/Azure/azure-sdk-for-go v32.5.0+incompatible
-	github.com/Azure/go-autorest/autorest v0.9.0 // indirect
-	github.com/Azure/go-autorest/autorest/to v0.2.0 // indirect
 	github.com/aws/aws-sdk-go v1.20.20
 	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927
-	github.com/dnaeon/go-vcr v1.0.1 // indirect
-	github.com/google/readahead v0.0.0-20161222183148-eaceba169032 // indirect
 	github.com/google/uuid v1.1.1
-	github.com/kr/pretty v0.1.0 // indirect
 	github.com/ncw/swift v1.0.49
 	github.com/pkg/errors v0.8.1
+	golang.org/x/net v0.38.0
+	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
+	google.golang.org/api v0.6.1-0.20190607001116-5213b8090861
+	gopkg.in/kothar/go-backblaze.v0 v0.0.0-20190520213052-702d4e7eb465
+)
+
+require (
+	cloud.google.com/go v0.38.0 // indirect
+	github.com/Azure/go-autorest/autorest v0.9.0 // indirect
+	github.com/Azure/go-autorest/autorest/adal v0.5.0 // indirect
+	github.com/Azure/go-autorest/autorest/date v0.1.0 // indirect
+	github.com/Azure/go-autorest/autorest/to v0.2.0 // indirect
+	github.com/Azure/go-autorest/logger v0.1.0 // indirect
+	github.com/Azure/go-autorest/tracing v0.5.0 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/dnaeon/go-vcr v1.0.1 // indirect
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
+	github.com/golang/protobuf v1.3.1 // indirect
+	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/readahead v0.0.0-20161222183148-eaceba169032 // indirect
+	github.com/hashicorp/golang-lru v0.5.1 // indirect
+	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/pquerna/ffjson v0.0.0-20190930134022-aa0246cd15f7 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/stretchr/testify v1.4.0 // indirect
-	golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c
-	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	google.golang.org/api v0.6.1-0.20190607001116-5213b8090861
+	go.opencensus.io v0.21.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
+	google.golang.org/appengine v1.5.0 // indirect
+	google.golang.org/genproto v0.0.0-20190502173448-54afdca5d873 // indirect
+	google.golang.org/grpc v1.20.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
-	gopkg.in/kothar/go-backblaze.v0 v0.0.0-20190520213052-702d4e7eb465
 )
 
 replace (
